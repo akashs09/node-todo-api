@@ -10,12 +10,8 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp',{ useNewUrlParser: true 
   }
   console.log('Connected to MongoDB server');
   const db = client.db('TodoApp');
-  db.collection('Todos').find().countDocuments({text: 'Something to do'}).then((count) => { //get the docs, turning them into an array and print to screen
-    console.log('Todos');
-
-    console.log(`Todos count: ${count}`);
-  }, (err) =>  {
-    console.log('Unable to fetch todos', err);
+  db.collection('Users').findOneAndDelete({_id: new ObjectID('5b6cf9ca6c4bfd24bde1110d')}).then((result) => {
+    console.log(result);
   });
   client.close();
 });
