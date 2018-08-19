@@ -84,6 +84,18 @@ app.patch('/todos/:id', (req,res) => {
   })
 });
 
+app.post('/users', (req, res) => {
+  const body = _.pick(req.body, ['email', 'password']);
+  const user = new User(body) //new instance of User model. no reason to pass in an obj that we have create again when body is already created above
+  user.save().then(() => {
+    return user.generateAuthToken(); //returning as wer're expecting a chain promise
+  }).then((token) => {
+    res.header('x-auth', token).send(user); //x-auth is custom header
+  }).catch((e) => {
+    res.status(400).send(e);
+  }) //save document to database and attached a 'then' callback
+});
+
 app.listen(port, () => {
   console.log(`Started on port ${port}`);
 });
