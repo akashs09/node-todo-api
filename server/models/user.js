@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema({ //lets you define a new schema to add o
 });
 
 UserSchema.methods.generateAuthToken = function () {
-  let user = this;
+  let user = this; //instance methods get called with the individual document
   let access = 'auth';
   let token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString(); //actual data we want to sign is the userId which is unique on this collection
   user.tokens = user.tokens.concat({access, token});
@@ -39,6 +39,23 @@ UserSchema.methods.generateAuthToken = function () {
     return token;
   })
 } //instance methods have access to the individuals documents
+
+UserSchema.statics.findByToken= function (token) {
+  let User = this //model methods get called with the 'this' binding
+  let decoded;
+  try {
+    decoded = jwt.verify(token, 'abc123')
+  } catch(e) {
+    return new Promise((resolve, reject) => { //this promise will get returned by the findByToken caller
+      reject();
+    })
+  }
+  return User.findOne({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  })
+}//using statics instead of methods bcuz everything you add onto it becomes model method not instance
 
 var User = mongoose.model('User', UserSchema);
 
