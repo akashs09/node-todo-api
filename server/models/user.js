@@ -1,6 +1,7 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 const UserSchema = new mongoose.Schema({ //lets you define a new schema to add on custom methods
   email: {
     type: String,
@@ -30,11 +31,18 @@ const UserSchema = new mongoose.Schema({ //lets you define a new schema to add o
   }]
 });
 
+UserSchema.methods.toJSON = function () {
+  var user = this;
+  var userObject = user.toObject();
+
+  return _.pick(userObject, ['_id', 'email']);
+};
+
 UserSchema.methods.generateAuthToken = function () {
   let user = this; //instance methods get called with the individual document
   let access = 'auth';
   let token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString(); //actual data we want to sign is the userId which is unique on this collection
-  user.tokens = user.tokens.concat({access, token});
+  user.tokens = user.tokens.concat([{access, token}]);
   return user.save().then(() => {
     return token;
   })
@@ -57,6 +65,19 @@ UserSchema.statics.findByToken= function (token) {
   })
 }//using statics instead of methods bcuz everything you add onto it becomes model method not instance
 
+UserSchema.pre('save', function(next) {
+  let user = this;
+  if (user.isModified('password')) {
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(user.password, salt, (err,hash) => {
+        user.password = hash;
+        next();
+      });
+    });
+  } else {
+    next();
+  }
+});
 var User = mongoose.model('User', UserSchema);
 
 module.exports = {User}
