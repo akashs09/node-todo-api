@@ -112,7 +112,13 @@ app.post('/users/login', (req, res) => { //purpose of this call is to get a toke
   });
 
 })
-
+app.delete('/users/me/token', authenticate, (req, res) => { //have to be authetnicated to run this and store token to request.token
+  req.user.removeToken(req.token).then(() => {
+    res.status(200).send();
+  }, () => {
+    res.status(400).send();
+  });
+});
 app.listen(port, () => {
   console.log(`Started on port ${port}`);
 });

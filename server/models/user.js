@@ -48,7 +48,16 @@ UserSchema.methods.generateAuthToken = function () {
     return token;
   })
 } //instance methods have access to the individuals documents
-
+UserSchema.methods.removeToken = function (token) {
+  let user = this;
+  return user.update({
+    $pull: {
+      tokens: {
+        token: token
+      }
+    }
+  });
+}
 UserSchema.statics.findByToken= function (token) {
   let User = this //model methods get called with the 'this' binding
   let decoded;
