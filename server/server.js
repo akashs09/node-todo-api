@@ -101,6 +101,17 @@ app.get('/users/me', authenticate, (req,res) => {
   res.send(req.user);
 });
 
+app.post('/users/login', (req, res) => { //purpose of this call is to get a token and continue to commit secure requests
+  const body = _.pick(req.body, ['email', 'password']);
+  User.findByCredentials(body.email, body.password).then((user) => { //adding a call to .then() once we find the user (success case)
+    return user.generateAuthToken().then((token) => {
+      res.header('x-auth', token).send(user); //x-auth is custom header
+    });
+  }).catch((e) => {
+      res.status(400).send(e);
+  });
+
+})
 
 app.listen(port, () => {
   console.log(`Started on port ${port}`);

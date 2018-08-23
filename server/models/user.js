@@ -66,6 +66,24 @@ UserSchema.statics.findByToken= function (token) {
   })
 }//using statics instead of methods bcuz everything you add onto it becomes model method not instance
 
+UserSchema.statics.findByCredentials = function (email, password) {
+  let User = this;
+  return User.findOne({email}).then((user) => { //chaining the promise
+    if (!user) {
+      return Promise.reject(); //the User.findByCredentials() in server.js is expecting a promise
+    }
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, user.password, (err, res) => { //bcrypt library only support callbacks not promises
+        if (res) {
+          resolve(user);
+        } else {
+          reject();
+        }
+      });
+    });
+  });
+};
+
 UserSchema.pre('save', function(next) {
   let user = this;
   if (user.isModified('password')) {
