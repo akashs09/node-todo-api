@@ -119,6 +119,7 @@ app.delete('/users/me/token', authenticate, (req, res) => { //have to be authetn
     res.status(400).send();
   });
 });
+
 app.listen(port, () => {
   console.log(`Started on port ${port}`);
 });
