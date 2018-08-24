@@ -16,14 +16,22 @@ const users = [{ //array of users we add for seed data
 }, {        //first user has valid auth token
   _id: userTwoId,
   email: 'jen@example.com',
-  password: 'userTwoPass'
+  password: 'userTwoPass',
+  tokens: [{
+    access: 'auth',
+    token: jwt.sign({_id: userTwoId, access: 'auth'}, 'abc123').toString()       //for the data we sign
+  }]
 }]; //second user has no auth token
 const todos = [{
   _id: new ObjectID(),
-  text: 'First test todo'
+  text: 'First test todo',
+  _creator: userOneId
 }, {
   _id: new ObjectID(),
-  text: 'Second test todo'
+  text: 'Second test todo',
+  completed: true,
+  completedAt: 333,
+  _creator: userTwoId
 }];
 
 const populateTodos = (done) => {

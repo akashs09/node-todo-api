@@ -1,6 +1,6 @@
 let {User} = require('./../models/user');
 
-
+//did you sign up or login succesfully is the way to get x-auth token to make authenticated requests
 let authenticate = (req, res, next) => {
   let token = req.header('x-auth');
 

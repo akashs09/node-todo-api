@@ -14,6 +14,10 @@ var Todo = mongoose.model('Todo', {
   completedAt: {
     type: Number,
     default: null
+  },
+  _creator: { //_ meaning object ID
+    type: mongoose.Schema.Types.ObjectId, //type is objectId
+    required: true //need to have valid ID therefore need to be logged in
   }
 });
 
